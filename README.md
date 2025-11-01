@@ -65,10 +65,13 @@ LM-Stas/
 │   ├── state_manager.js
 │   └── node_modules
 ├── frontend/
-│   ├── package.json
-│   ├── src/
-│   └── ...other frontend files...
+│   ├── app.js
+│   ├── backupIndex.html
+│   ├── index.html
+│   └── assets #gifs for right corner
+
 ├── README.md
+├── config.json #kinda broken btw
 └── LICENSE
 ```
 
