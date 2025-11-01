@@ -55,9 +55,15 @@ npm start
 ```text
 LM-Stas/
 ├── backend/
+│   ├── ollama_handler.js
 │   ├── package.json
-│   ├── index.js
-│   └── ...other backend files...
+│   ├── package-lock.json
+│   ├── prompt_constructor.js
+│   ├── script_handler.js
+│   ├── server.js
+│   ├── state.json
+│   ├── state_manager.js
+│   └── node_modules
 ├── frontend/
 │   ├── package.json
 │   ├── src/
