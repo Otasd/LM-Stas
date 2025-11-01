@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LM-Stas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .aggressive-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle {
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: #ff4757;
+        }
+
+        .toggle-slider {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle.active .toggle-slider {
+            left: 20px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 10px;
+            height: calc(100vh - 80px);
+            min-height: 0;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .input-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-box textarea {
+            width: 100%;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            resize: none;
+            font-size: 14px;
+        }
+
+        .input-box textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-btn {
+            height: 80px;
+            width: 100px;
+            background: #ff4757;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #ff6b81;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .output-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            border-left: 3px solid #fff;
+            font-size: 16px;
+        }
+
+        .message.user {
+            border-left-color: #00d2ff;
+        }
+
+        .message.assistant {
+            border-left-color: #ff4757;
+        }
+
+        .message-label {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .message-content {
+            white-space: pre-wrap !important;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .video-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            max-height: 400px;
+        }
+
+        .video-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-status {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .emotion-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        #commandStatus {
+            color: #ffd93d;
+            font-weight: bold;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        .history-section {
+            min-height: 100vh;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .history-header {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .history-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-empty {
+            text-align: center;
+            opacity: 0.6;
+            padding: 40px;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            opacity: 0.7;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        .hide-scroll-indicator {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .placeholder-text {
+            text-align: center;
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .video-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <button class="btn" id="clearHistoryBtn">Clear History</button>
+                <span id="modelName">Model: LM-Stas ..not related to real person..</span>
+            </div>
+            <div class="header-right">
+                <span id="cpuLoad">CPU: 0%</span>
+                <span id="ramLoad">RAM: 0%</span>
+                <div class="aggressive-toggle">
+                    <span>Aggressive Mode</span>
+                    <div class="toggle" id="aggressiveToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="input-box">
+                    <textarea id="questionInput" placeholder="Ask your question..."></textarea>
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+                <div class="output-box" id="chatArea">
+                    <div class="placeholder-text">Your conversation will appear here...</div>
+                </div>
+            </div>
+
+            <div class="video-panel">
+                <div class="video-container">
+                    <img id="videoPlayer" alt="AI Emotion GIF" src="">
+                </div>
+                <div class="video-status">
+                    <div>Status: <span id="videoStatus">Initializing...</span></div>
+                    <div class="emotion-tag" id="emotionTag">neutral</div>
+                    <div id="commandStatus" style="display: none;">COMMAND EXECUTED!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+        ↓ Scroll down to see history ↓
+    </div>
+
+    <div class="history-section">
+        <div class="history-header">Conversation History</div>
+        <div class="history-container" id="historyContainer">
+            <div class="history-empty">No history yet. Start a conversation above!</div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:3000/api/chat';
+
+        const chatArea = document.getElementById('chatArea');
+        const questionInput = document.getElementById('questionInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const aggressiveToggle = document.getElementById('aggressiveToggle');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoStatus = document.getElementById('videoStatus');
+        const emotionTag = document.getElementById('emotionTag');
+        const commandStatus = document.getElementById('commandStatus');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        let isAggressive = false;
+        let waitingLoopTimer = null;
+
+        const ASSET_PATHS = {
+            waiting: [
+                'assets/waiting/waiting1.gif',
+                'assets/waiting/waiting2.gif',
+                'assets/waiting/waiting3.gif'
+            ],
+            working: [
+                'assets/working/working1.gif',
+                'assets/working/working2.gif',
+                'assets/working/working3.gif'
+            ],
+            response: {
+                happy: ['assets/happy/happy1.gif', 'assets/happy/happy2.gif', 'assets/happy/happy3.gif'],
+                interested: ['assets/interested/interested1.gif', 'assets/interested/interested2.gif', 'assets/interested/interested3.gif'],
+                bored: ['assets/bored/bored1.gif', 'assets/bored/bored2.gif', 'assets/bored/bored3.gif'],
+                aggressive: ['assets/aggressive/aggressive1.gif', 'assets/aggressive/aggressive2.gif', 'assets/aggressive/aggressive3.gif'],
+                'default': ['assets/waiting/waiting1.gif'],
+                'error': ['assets/aggressive/aggressive1.gif']
+            }
+        };
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function playWaitingVideo() {
+            if (waitingLoopTimer) {
+                clearTimeout(waitingLoopTimer);
+            }
+            
+            const videoSrc = getRandomElement(ASSET_PATHS.waiting);
+            videoPlayer.src = videoSrc;
+            
+            videoStatus.textContent = 'Waiting';
+            emotionTag.textContent = 'neutral';
+
+            waitingLoopTimer = setTimeout(playWaitingVideo, 10000);
+        }
+
+        function playWorkingVideo() {
+            if (waitingLoopTimer) {
+                clearTimeout(waitingLoopTimer);
+                waitingLoopTimer = null;
+            }
+            
+            const videoSrc = getRandomElement(ASSET_PATHS.working);
+            videoPlayer.src = videoSrc;
+
+            videoStatus.textContent = 'Working...';
+        }
+
+        function playResponseVideo(emotionTagStr) {
+            if (waitingLoopTimer) {
+                clearTimeout(waitingLoopTimer);
+                waitingLoopTimer = null;
+            }
+
+            const tag = emotionTagStr.replace(/\^/g, '');
+            const videoList = ASSET_PATHS.response[tag] || ASSET_PATHS.response['default'];
+            const videoSrc = getRandomElement(videoList);
+            
+            videoStatus.textContent = 'Speaking...';
+            emotionTag.textContent = tag;
+            
+            const img = new Image();
+            img.onload = () => {
+                videoPlayer.src = videoSrc;
+                setTimeout(() => {
+                    playWaitingVideo();
+                }, 4000);
+            };
+            img.src = videoSrc;
+        }
+
+        function toggleAggressive() {
+            isAggressive = !isAggressive;
+            aggressiveToggle.classList.toggle('active', isAggressive);
+        }
+
+        function clearHistory() {
+            chatArea.innerHTML = '<div class="placeholder-text">History cleared. Let\'s start fresh.</div>';
+            document.getElementById('historyContainer').innerHTML = '<div class="history-empty">No history yet. Start a conversation above!</div>';
+            playWaitingVideo();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateOutputBox(question, answer) {
+            chatArea.innerHTML = `
+                <div class="message user">
+                    <div class="message-label">You</div>
+                    <div class="message-content">${escapeHtml(question)}</div>
+                </div>
+                <div class="message assistant">
+                    <div class="message-label">AI</div>
+                    <div class="message-content">${escapeHtml(answer)}</div>
+                </div>
+            `;
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function updateHistorySection(question, answer) {
+            const historyContainer = document.getElementById('historyContainer');
+            
+            if (historyContainer.querySelector('.history-empty')) {
+                historyContainer.innerHTML = '';
+            }
+
+            historyContainer.innerHTML += `
+                <div class="message user">
+                    <div class="message-label">You</div>
+                    <div class="message-content">${escapeHtml(question)}</div>
+                </div>
+                <div class="message assistant">
+                    <div class="message-label">AI</div>
+                    <div class="message-content">${escapeHtml(answer)}</div>
+                </div>
+            `;
+        }
+
+        async function sendQuestion() {
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loading"></span> Sending...';
+            questionInput.value = '';
+
+            chatArea.innerHTML = `
+                <div class="message user">
+                    <div class="message-label">You</div>
+                    <div class="message-content">${escapeHtml(question)}</div>
+                </div>
+                <div class="message assistant">
+                    <div class="message-label">AI</div>
+                    <div><span class="loading"></span> Thinking...</div>
+                </div>
+            `;
+
+            playWorkingVideo();
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userInput: question, isAggressive: isAggressive })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const rawResponse = data.responseText;
+                
+                // Check first 50 characters for emotion words
+                const first50 = rawResponse.substring(0, 50).toLowerCase();
+                
+                let emotion = 'default';
+                let cleanText = rawResponse;
+                
+                // Check for emotion keywords
+                if (first50.includes('aggressive')) {
+                    emotion = 'aggressive';
+                    cleanText = rawResponse.replace(/aggressive/i, '').trim();
+                } else if (first50.includes('happy')) {
+                    emotion = 'happy';
+                    cleanText = rawResponse.replace(/happy/i, '').trim();
+                } else if (first50.includes('interested')) {
+                    emotion = 'interested';
+                    cleanText = rawResponse.replace(/interested/i, '').trim();
+                } else if (first50.includes('bored')) {
+                    emotion = 'bored';
+                    cleanText = rawResponse.replace(/bored/i, '').trim();
+                }
+                
+                // Remove ^emotion^ tags if present
+                cleanText = cleanText.replace(/\^(happy|interested|bored|aggressive)\^/gi, '').trim();
+
+                console.log("RAW (first 50):", first50);
+                console.log("Parsed Emotion:", emotion);
+                console.log("Clean Text:", cleanText);
+
+                updateOutputBox(question, cleanText);
+                updateHistorySection(question, cleanText);
+                
+                if (emotion && emotion !== 'default') {
+                    playResponseVideo(emotion);
+                } else {
+                    playWaitingVideo();
+                }
+
+                if (data.commandExecuted) {
+                    console.warn('[COMMAND EXECUTED]');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = `System Error: ${error.message}`;
+                updateOutputBox(question, errorMessage);
+                playResponseVideo('error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = 'Send';
+            }
+        }
+
+        sendBtn.addEventListener('click', sendQuestion);
+        clearHistoryBtn.addEventListener('click', clearHistory);
+        aggressiveToggle.addEventListener('click', toggleAggressive);
+        
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQuestion();
+            }
+        });
+
+        playWaitingVideo();
+
+        setInterval(() => {
+            const cpu = Math.floor(Math.random() * 30 + 10);
+            const ram = Math.floor(Math.random() * 40 + 20);
+            document.getElementById('cpuLoad').textContent = `CPU: ${cpu}%`;
+            document.getElementById('ramLoad').textContent = `RAM: ${ram}%`;
+        }, 2000);
+
+        window.addEventListener('scroll', () => {
+            const indicator = document.getElementById('scrollIndicator');
+            if (window.scrollY > 100) {
+                indicator.classList.add('hide-scroll-indicator');
+            } else {
+                indicator.classList.remove('hide-scroll-indicator');
+            }
+        });
+    </script>
+</body>
+</html>
