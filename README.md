@@ -15,6 +15,8 @@ Ever wanted to talk directly to Stas? Now you can, through a conversational AI i
 
 ## Installation
 
+INSTALL NPM
+
 ### Linux
 
 ```bash
