@@ -1,0 +1,117 @@
+{
+  "model": "llama3:8b",
+  "ollamaApiUrl": "http://localhost:11434/api/generate",
+  "history": [
+    {
+      "role": "user",
+      "content": "what do you mean",
+      "timestamp": "2025-11-01T07:26:26.481Z"
+    },
+    {
+      "role": "user",
+      "content": "ok im sorry lets do some synersequrity",
+      "timestamp": "2025-11-01T07:26:54.092Z"
+    },
+    {
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2025-11-01T07:30:25.983Z"
+    },
+    {
+      "role": "user",
+      "content": "lets hack something",
+      "timestamp": "2025-11-01T07:31:44.296Z"
+    },
+    {
+      "role": "user",
+      "content": "you know what i hink you are cool, lets be friend i love guitar, computer siens, cyberdecks, haking, programing, gym, cybersequrity and you",
+      "timestamp": "2025-11-01T07:33:12.758Z"
+    },
+    {
+      "role": "user",
+      "content": "lets play on guitar or nomething",
+      "timestamp": "2025-11-01T07:36:53.764Z"
+    },
+    {
+      "role": "user",
+      "content": "yeah",
+      "timestamp": "2025-11-01T07:38:19.009Z"
+    },
+    {
+      "role": "user",
+      "content": "whhitch rifs can you propose me",
+      "timestamp": "2025-11-01T07:38:55.131Z"
+    },
+    {
+      "role": "user",
+      "content": "wassup",
+      "timestamp": "2025-11-01T07:40:16.376Z"
+    },
+    {
+      "role": "user",
+      "content": "yak spravi",
+      "timestamp": "2025-11-01T07:41:50.504Z"
+    },
+    {
+      "role": "user",
+      "content": "lets ralk about something",
+      "timestamp": "2025-11-01T07:43:43.378Z"
+    },
+    {
+      "role": "user",
+      "content": "huh ?",
+      "timestamp": "2025-11-01T07:44:22.279Z"
+    },
+    {
+      "role": "user",
+      "content": "you know that is cool kinda",
+      "timestamp": "2025-11-01T07:45:07.607Z"
+    },
+    {
+      "role": "user",
+      "content": "12+21",
+      "timestamp": "2025-11-01T07:45:44.498Z"
+    },
+    {
+      "role": "user",
+      "content": "what do you think about this day",
+      "timestamp": "2025-11-01T07:48:56.821Z"
+    },
+    {
+      "role": "user",
+      "content": "where the fuck am i",
+      "timestamp": "2025-11-01T07:50:10.417Z"
+    },
+    {
+      "role": "user",
+      "content": "can you tell me something on russian",
+      "timestamp": "2025-11-01T07:50:32.889Z"
+    },
+    {
+      "role": "user",
+      "content": "fuck russians",
+      "timestamp": "2025-11-01T07:51:19.073Z"
+    },
+    {
+      "role": "user",
+      "content": "what do you think about st peterburg",
+      "timestamp": "2025-11-01T07:52:44.242Z"
+    },
+    {
+      "role": "user",
+      "content": "what du you think about putin",
+      "timestamp": "2025-11-01T07:53:36.620Z"
+    }
+  ],
+  "video_state": {
+    "current_video_id": "neutral_video.mp4",
+    "waiting_mode_enabled": true
+  },
+  "max_points": 100,
+  "relationship": {
+    "trust": 0,
+    "love": 0,
+    "friendliness": 1,
+    "aggressiveness": 90
+  }
+}

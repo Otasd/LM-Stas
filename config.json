@@ -1,0 +1,12 @@
+{
+  "model": "llama3:8b", 
+  "ollamaApiUrl": "http://localhost:11434/api/generate",
+  "relationship": {
+    "trust": 70,
+    "love": 5,
+    "friendliness": 60,
+    "aggressiveness": 40
+  },
+  "max_points": 100,
+  "min_points": 1
+}
