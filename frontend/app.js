@@ -7,12 +7,12 @@ const chatArea = document.getElementById('chat-area');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
 const clearHistoryButton = document.getElementById('clear-history');
-const debugEmotion = document.getElementById('debug-emotion'); // Оставлено для отладки
-const videoStatus = document.getElementById('video-status'); // Оставлено для отладки
+const debugEmotion = document.getElementById('debug-emotion'); // debug 
+const videoStatus = document.getElementById('video-status'); // also
 
 // --- Video ---
-const videoPlayer = document.getElementById('videoPlayer'); // Наш новый <video> элемент
-let waitingLoopTimer = null; // Таймер для 10-секундного цикла ожидания
+const videoPlayer = document.getElementById('videoPlayer'); // video elemen
+let waitingLoopTimer = null; // timer 10 sec till the and of loop
 
 // --- path to assets ---
 const ASSET_PATHS = {
