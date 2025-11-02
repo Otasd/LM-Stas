@@ -1,13 +1,13 @@
 # LM-Stas
 
 LM-Stas is a fun project by Stas that lets you chat with the legend himself!  
-Ever wanted to talk directly to Stas? Now you can, through a conversational AI interface powered by Ollama and Llama3.
+Ever wanted to talk directly to Stas? Now you can, through a conversational AI interface powered by Ollama and huihui_ai/qwen3-abliterated:8b.
 
 ---
 
 ## Features
 
-- Chat directly with "Stas" using Llama3 as the backend
+- Chat directly with "Stas" using huihui_ai/qwen3-abliterated:8b as the backend
 - Easy setup for both Linux and Windows
 - Powered by Node.js and Ollama
 
