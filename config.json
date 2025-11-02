@@ -1,5 +1,5 @@
 {
-  "model": "llama3:8b", 
+  "model": "huihui_ai/qwen3-abliterated:8b", 
   "ollamaApiUrl": "http://localhost:11434/api/generate",
   "relationship": {
     "trust": 70,
