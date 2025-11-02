@@ -22,7 +22,7 @@ INSTALL NPM
 ```bash
 git clone https://github.com/Otasd/LM-Stas.git
 curl -fsSL https://ollama.com/install.sh | sh
-ollama pull llama3:8b
+ollama pull huihui_ai/qwen3-abliterated:8b
 cd LM-Stas/backend
 npm install
 npm start
@@ -40,7 +40,7 @@ npm start
    - Go to [Ollama Windows Install](https://ollama.com/download) and follow instructions
    - In your terminal or Command Prompt:
      ```bash
-     ollama pull llama3:8b
+     ollama pull huihui_ai/qwen3-abliterated:8b
      ```
 3. **Start the backend:**
    - Open Command Prompt, PowerShell, or terminal:
