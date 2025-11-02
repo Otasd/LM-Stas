@@ -2,7 +2,7 @@
 const BACKEND_URL = 'http://localhost:3000/api/chat';
 const CLEAR_HISTORY_URL = 'http://localhost:3000/api/clear-history';
 
-// --- ЭЛЕМЕНТЫ UI ---
+// --- UI ---
 const chatArea = document.getElementById('chat-area');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
@@ -10,26 +10,26 @@ const clearHistoryButton = document.getElementById('clear-history');
 const debugEmotion = document.getElementById('debug-emotion'); // Оставлено для отладки
 const videoStatus = document.getElementById('video-status'); // Оставлено для отладки
 
-// --- ❗ НОВЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ВИДЕО ---
+// --- Video ---
 const videoPlayer = document.getElementById('videoPlayer'); // Наш новый <video> элемент
 let waitingLoopTimer = null; // Таймер для 10-секундного цикла ожидания
 
-// --- ❗ ПУТИ К ТВОИМ АССЕТАМ (КАК ТЫ И ПРОСИЛ) ---
+// --- path to assets ---
 const ASSET_PATHS = {
-    // 20 гифок (пока 3 для теста)
+    // 20 gifs (for the moment 3)
     waiting: [
         '/assets/waiting/waiting1.gif',
         '/assets/waiting/waiting2.gif',
         '/assets/waiting/waiting3.gif'
-        // Добавь сюда waiting4.gif ... waiting20.gif
+     
     ],
-    // Гифки во время работы
+
     working: [
         '/assets/working/working1.gif',
         '/assets/working/working2.gif'
-        // Добавь еще, если есть
+
     ],
-    // Гифки ответа (по 3 на эмоцию)
+
     response: {
         happy: [
             '/assets/happy/happy1.gif',
@@ -51,55 +51,55 @@ const ASSET_PATHS = {
             '/assets/aggressive/aggressive2.gif',
             '/assets/aggressive/aggressive3.gif'
         ],
-        // Добавь 'love' или 'default', если они нужны
+
         'default': [
-            '/assets/waiting/waiting1.gif' // По умолчанию
+            '/assets/waiting/waiting1.gif' 
         ],
         'error': [
-            '/assets/aggressive/aggressive1.gif' // Если ошибка
+            '/assets/aggressive/aggressive1.gif' 
         ]
     }
 };
 
 /**
- * Вспомогательная функция для выбора случайного элемента из массива
+ * sub function to get element out of array
  */
 function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// --- ❗ НОВАЯ ЛОГИКА УПРАВЛЕНИЯ ВИДЕО ---
+// --- ❗ video control logic ---
 
 /**
- * СОСТОЯНИЕ 1: ОЖИДАНИЕ (WAITING)
- * Играет случайную гифку ожидания.
- * Через 10 секунд запускает себя снова, выбирая новую гифку.
+ * STATE 1: WAITING
+ * Plays a random waiting GIF.
+ * Reruns itself after 10 seconds, selecting a new GIF.
  */
 function playWaitingVideo() {
-    // Очищаем старый таймер, если он был
+    // clean old timer if had one (probably not working idk)
     if (waitingLoopTimer) {
         clearTimeout(waitingLoopTimer);
     }
     
     const videoSrc = getRandomElement(ASSET_PATHS.waiting);
     videoPlayer.src = videoSrc;
-    videoPlayer.loop = true; // Гифки ожидания должны повторяться
+    videoPlayer.loop = true; // waiting gifs should repit
     videoPlayer.play();
     
     videoStatus.textContent = 'Waiting';
     debugEmotion.textContent = 'neutral';
 
-    // Устанавливаем новый таймер на 10 секунд
-    waitingLoopTimer = setTimeout(playWaitingVideo, 10000); // 10000 мс = 10 секунд
+    // timer for waiting video 
+    waitingLoopTimer = setTimeout(playWaitingVideo, 10000); // 10000 мс = 10 sec
 }
 
 /**
- * СОСТОЯНИЕ 2: РАБОТА (WORKING)
- * Вызывается при нажатии "Send".
- * Прерывает цикл ожидания и играет гифку работы (loop: true).
+ * STATE 2: WORKING
+ * Called when "Send" is clicked.
+ * Interrupts the waiting loop and plays the working GIF (loop: true).
  */
 function playWorkingVideo() {
-    // Прерываем 10-секундный цикл ожидания
+    // Interrupt the 10-second waiting loop
     if (waitingLoopTimer) {
         clearTimeout(waitingLoopTimer);
         waitingLoopTimer = null;
@@ -114,10 +114,10 @@ function playWorkingVideo() {
 }
 
 /**
- * СОСТОЯНИЕ 3: ОТВЕТ (RESPONSE)
- * Вызывается, когда ИИ прислал ответ.
- * Играет ОДИН РАЗ гифку эмоции.
- * Когда гифка заканчивается, 'onended' listener (см. ниже) вернет нас в режим ОЖИДАНИЯ.
+ * STATE 3: RESPONSE
+ * Called when the AI has sent a response.
+ * Plays an emotion GIF ONCE.
+ * When the GIF ends, the 'onended' listener (see below) will return us to WAITING mode.
  */
 function playResponseVideo(emotionTag) {
     const tag = emotionTag.replace(/\^/g, '').trim(); // Clean and trim the tag
@@ -132,10 +132,10 @@ function playResponseVideo(emotionTag) {
     debugEmotion.textContent = tag;
 }
 
-// --- ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ ---
+// --- main app functions ---
 
 /**
- * Добавляет сообщение в чат.
+ * add mess to chat.
  */
 function appendMessage(text, sender) {
     const messageElement = document.createElement('div');
@@ -148,23 +148,23 @@ function appendMessage(text, sender) {
 }
 
 /**
- * Главная функция отправки запроса
+ *  MAIN FUNCTION OF SENDING REQUEST !!DO NOT TOUCH!!
  */
 async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
 
-    // 1. Сброс UI
+    // 1. clean UI
     userInput.value = '';
     appendMessage(text, 'user');
     sendButton.disabled = true;
     
-    // --- ❗ ВЫЗЫВАЕМ СОСТОЯНИЕ 2 (РАБОТА) ---
+  // --- ❗ CALLING STATE 2 (WORKING) ---
     playWorkingVideo();
     
     try {
-        // 2. Отправка данных (без isAggressive, так как мы удалили его)
-        const response = await fetch(BACKEND_URL, {
+            // 2. Data submission (without isAggressive, as we have removed it)       
+            const response = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userInput: text })
@@ -176,7 +176,7 @@ async function sendMessage() {
 
         const data = await response.json();
         
-        // 3. ПАРСИНГ ОТВЕТА (для видео)
+        // 3. parcing answer for video DO NOT TOUCH 
         const rawResponse = data.responseText;
         const emotionRegex = /^(\^[^ \t]+\^)/;
         const match = rawResponse.match(emotionRegex);
@@ -189,7 +189,7 @@ async function sendMessage() {
             cleanText = rawResponse.replace(match[1], '').trim();
         }
 
-        // 4. ОБНОВЛЕНИЕ UI
+        // 4. Update UI
         appendMessage(cleanText, 'bot');
         
         const validEmotions = ['happy', 'interested', 'bored', 'aggressive'];
@@ -203,7 +203,7 @@ async function sendMessage() {
         console.error('Fetch or parsing error:', error);
         appendMessage(`System Error: Could not connect to the server or AI. (${error.message})`, 'bot');
         
-        // Если ошибка, тоже играем видео (например, 'error' или 'aggressive')
+        // If an error occurs, we also play a video (e.g., 'error' or 'aggressive')
         playResponseVideo('error');
 
     } finally {
@@ -212,10 +212,10 @@ async function sendMessage() {
 }
 
 /**
- * Функция сброса истории
+ * Cleaning history Does not work kinda if you know how fix it text pls
  */
 async function clearHistory() {
-    if (!confirm("Ты уверен, что хочешь стереть LM-Stas'у память, придурок?")) {
+    if (!confirm("are you shure that you wanna clean my memory")) {
         return; 
     }
 
@@ -237,7 +237,7 @@ async function clearHistory() {
             console.log("Память LM-Stas'а успешно стерта.");
             alert("Память LM-Stas'а успешно стерта!");
             
-            // Сбрасываем видео в режим ожидания
+            // droping video in waiting mode
             playWaitingVideo();
 
         } else {
@@ -263,27 +263,27 @@ userInput.addEventListener('keypress', (e) => {
 clearHistoryButton.addEventListener('click', clearHistory);
 
 /**
- * ❗ ОБРАБОТЧИК ОКОНЧАНИЯ ВИДЕО
- * Этот обработчик следит, когда видео заканчивается.
- * Если это было видео ОТВЕТА (loop == false), он запускает режим ОЖИДАНИЯ.
+ * ❗ VIDEO END HANDLER
+ * This handler monitors when a video ends.
+ * If it was a RESPONSE video (loop == false), it starts the WAITING mode.
  */
 videoPlayer.onended = () => {
     if (videoPlayer.loop === false) {
-        // Видео ответа закончилось, возвращаемся к ожиданию
+        // video finished comeback to playing
         playWaitingVideo();
     }
-    // Если loop === true, это гифка ожидания или работы, она просто продолжается
+    // If loop === true, it's a waiting or working GIF, it simply continues
 };
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. При старте страницы СРАЗУ запускаем режим ОЖИДАНИЯ
+    // 1. if page startted we play waiting mode
     playWaitingVideo();
     
-    // 2. Загружаем начальные системные данные
+    // 2. load start system data
     let modelStatus = document.querySelector('.model-status');
     if (modelStatus) {
-        // Убедись, что ты исправил это на 'llama3' (ты удалил tinyllama)
+        // idk why is it working and i dont wanna chenge it 
         modelStatus.textContent = 'Model: llama3'; 
     }
 });
