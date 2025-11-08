@@ -448,6 +448,16 @@
 
         let isAggressive = false;
         let waitingLoopTimer = null;
+        
+        // Track recently played videos to avoid repetition
+        let recentVideos = {
+            waiting: [],
+            working: [],
+            happy: [],
+            interested: [],
+            bored: [],
+            aggressive: []
+        };
 
         // All 20 waiting videos + working and emotion videos
         const ASSET_PATHS = {
@@ -492,18 +502,58 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
+        // Improved random selection that avoids recent repeats
+        function getSmartRandomElement(arr, category) {
+            if (!arr || arr.length === 0) return null;
+            
+            // If array has only 1 item, return it
+            if (arr.length === 1) return arr[0];
+            
+            // Initialize recent array for this category if it doesn't exist
+            if (!recentVideos[category]) {
+                recentVideos[category] = [];
+            }
+            
+            // For small arrays (3 or less), avoid only the last played
+            const avoidCount = arr.length <= 3 ? 1 : Math.min(3, Math.floor(arr.length / 3));
+            
+            // Get available options (not recently played)
+            let availableOptions = arr.filter(item => !recentVideos[category].includes(item));
+            
+            // If all options were recent, reset and use full array
+            if (availableOptions.length === 0) {
+                recentVideos[category] = [];
+                availableOptions = arr;
+            }
+            
+            // Pick random from available options
+            const selected = availableOptions[Math.floor(Math.random() * availableOptions.length)];
+            
+            // Add to recent list
+            recentVideos[category].push(selected);
+            
+            // Keep only last N items in recent list
+            if (recentVideos[category].length > avoidCount) {
+                recentVideos[category].shift();
+            }
+            
+            return selected;
+        }
+
         function playWaitingVideo() {
             if (waitingLoopTimer) {
                 clearTimeout(waitingLoopTimer);
             }
             
-            const videoSrc = getRandomElement(ASSET_PATHS.waiting);
+            const videoSrc = getSmartRandomElement(ASSET_PATHS.waiting, 'waiting');
             videoPlayer.src = videoSrc;
             videoPlayer.loop = true;
             videoPlayer.play().catch(e => console.log('Play failed:', e));
             
             videoStatus.textContent = 'Waiting';
             emotionTag.textContent = 'neutral';
+            
+            console.log('Playing waiting video:', videoSrc.split('/').pop());
 
             waitingLoopTimer = setTimeout(playWaitingVideo, 10000);
         }
@@ -514,12 +564,13 @@
                 waitingLoopTimer = null;
             }
             
-            const videoSrc = getRandomElement(ASSET_PATHS.working);
+            const videoSrc = getSmartRandomElement(ASSET_PATHS.working, 'working');
             videoPlayer.src = videoSrc;
             videoPlayer.loop = true;
             videoPlayer.play().catch(e => console.log('Play failed:', e));
 
             videoStatus.textContent = 'Working...';
+            console.log('Playing working video:', videoSrc.split('/').pop());
         }
 
         function playResponseVideo(emotionTagStr) {
@@ -530,19 +581,34 @@
 
             const tag = emotionTagStr.replace(/\^/g, '');
             const videoList = ASSET_PATHS.response[tag] || ASSET_PATHS.response['default'];
-            const videoSrc = getRandomElement(videoList);
+            const videoSrc = getSmartRandomElement(videoList, tag);
             
             videoStatus.textContent = 'Speaking...';
             emotionTag.textContent = tag;
             
             videoPlayer.src = videoSrc;
             videoPlayer.loop = false;
+            
+            console.log('Playing response video:', videoSrc.split('/').pop(), 'emotion:', tag);
+            
+            // Play the video and set a maximum timeout of 15 seconds
             videoPlayer.play().catch(e => console.log('Play failed:', e));
+            
+            // Fallback: After 15 seconds, return to waiting regardless
+            waitingLoopTimer = setTimeout(() => {
+                playWaitingVideo();
+            }, 15000);
         }
 
-        // Handle video ended event - return to waiting after response video
+        // Handle video ended event - return to waiting after response video finishes naturally
         videoPlayer.addEventListener('ended', () => {
             if (!videoPlayer.loop) {
+                // Clear any existing timeout
+                if (waitingLoopTimer) {
+                    clearTimeout(waitingLoopTimer);
+                    waitingLoopTimer = null;
+                }
+                // Wait a moment then return to waiting
                 setTimeout(() => {
                     playWaitingVideo();
                 }, 500);
@@ -718,4 +784,3 @@
     </script>
 </body>
 </html>
-
