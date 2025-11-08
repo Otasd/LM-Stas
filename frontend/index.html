@@ -240,7 +240,7 @@
             max-height: 400px;
         }
 
-        .video-container img {
+        .video-container video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -411,7 +411,7 @@
 
             <div class="video-panel">
                 <div class="video-container">
-                    <img id="videoPlayer" alt="AI Emotion GIF" src="">
+                    <video id="videoPlayer" muted playsinline></video>
                 </div>
                 <div class="video-status">
                     <div>Status: <span id="videoStatus">Initializing...</span></div>
@@ -449,24 +449,42 @@
         let isAggressive = false;
         let waitingLoopTimer = null;
 
+        // All 20 waiting videos + working and emotion videos
         const ASSET_PATHS = {
             waiting: [
-                'assets/waiting/waiting1.gif',
-                'assets/waiting/waiting2.gif',
-                'assets/waiting/waiting3.gif'
+                './assets/waiting/waiting1.mp4',
+                './assets/waiting/waiting2.mp4',
+                './assets/waiting/waiting3.mp4',
+                './assets/waiting/waiting4.mp4',
+                './assets/waiting/waiting5.mp4',
+                './assets/waiting/waiting6.mp4',
+                './assets/waiting/waiting7.mp4',
+                './assets/waiting/waiting8.mp4',
+                './assets/waiting/waiting9.mp4',
+                './assets/waiting/waiting10.mp4',
+                './assets/waiting/waiting11.mp4',
+                './assets/waiting/waiting12.mp4',
+                './assets/waiting/waiting13.mp4',
+                './assets/waiting/waiting14.mp4',
+                './assets/waiting/waiting15.mp4',
+                './assets/waiting/waiting16.mp4',
+                './assets/waiting/waiting17.mp4',
+                './assets/waiting/waiting18.mp4',
+                './assets/waiting/waiting19.mp4',
+                './assets/waiting/waiting20.mp4'
             ],
             working: [
-                'assets/working/working1.gif',
-                'assets/working/working2.gif',
-                'assets/working/working3.gif'
+                './assets/working/working1.mp4',
+                './assets/working/working2.mp4',
+                './assets/working/working3.mp4'
             ],
             response: {
-                happy: ['assets/happy/happy1.gif', 'assets/happy/happy2.gif', 'assets/happy/happy3.gif'],
-                interested: ['assets/interested/interested1.gif', 'assets/interested/interested2.gif', 'assets/interested/interested3.gif'],
-                bored: ['assets/bored/bored1.gif', 'assets/bored/bored2.gif', 'assets/bored/bored3.gif'],
-                aggressive: ['assets/aggressive/aggressive1.gif', 'assets/aggressive/aggressive2.gif', 'assets/aggressive/aggressive3.gif'],
-                'default': ['assets/waiting/waiting1.gif'],
-                'error': ['assets/aggressive/aggressive1.gif']
+                happy: ['./assets/happy/happy1.mp4', './assets/happy/happy2.mp4', './assets/happy/happy3.mp4'],
+                interested: ['./assets/interested/interested1.mp4', './assets/interested/interested2.mp4', './assets/interested/interested3.mp4'],
+                bored: ['./assets/bored/bored1.mp4', './assets/bored/bored2.mp4', './assets/bored/bored3.mp4'],
+                aggressive: ['./assets/aggressive/aggressive1.mp4', './assets/aggressive/aggressive2.mp4', './assets/aggressive/aggressive3.mp4'],
+                'default': ['./assets/waiting/waiting1.mp4'],
+                'error': ['./assets/aggressive/aggressive1.mp4']
             }
         };
 
@@ -481,6 +499,8 @@
             
             const videoSrc = getRandomElement(ASSET_PATHS.waiting);
             videoPlayer.src = videoSrc;
+            videoPlayer.loop = true;
+            videoPlayer.play().catch(e => console.log('Play failed:', e));
             
             videoStatus.textContent = 'Waiting';
             emotionTag.textContent = 'neutral';
@@ -496,6 +516,8 @@
             
             const videoSrc = getRandomElement(ASSET_PATHS.working);
             videoPlayer.src = videoSrc;
+            videoPlayer.loop = true;
+            videoPlayer.play().catch(e => console.log('Play failed:', e));
 
             videoStatus.textContent = 'Working...';
         }
@@ -513,15 +535,19 @@
             videoStatus.textContent = 'Speaking...';
             emotionTag.textContent = tag;
             
-            const img = new Image();
-            img.onload = () => {
-                videoPlayer.src = videoSrc;
+            videoPlayer.src = videoSrc;
+            videoPlayer.loop = false;
+            videoPlayer.play().catch(e => console.log('Play failed:', e));
+        }
+
+        // Handle video ended event - return to waiting after response video
+        videoPlayer.addEventListener('ended', () => {
+            if (!videoPlayer.loop) {
                 setTimeout(() => {
                     playWaitingVideo();
-                }, 4000);
-            };
-            img.src = videoSrc;
-        }
+                }, 500);
+            }
+        });
 
         function toggleAggressive() {
             isAggressive = !isAggressive;
@@ -671,6 +697,7 @@
             }
         });
 
+        // Initialize
         playWaitingVideo();
 
         setInterval(() => {
@@ -691,3 +718,4 @@
     </script>
 </body>
 </html>
+
